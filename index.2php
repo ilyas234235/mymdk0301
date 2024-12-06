@@ -1,0 +1,602 @@
+//1. Разработайте PHP-скрипт, который принимает через форму два числа и выполняет сложение, выводя результат на экран.
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $num1 = $_POST["num1"];
+    $num2 = $_POST["num2"];
+    $result = $num1 + $num2;
+    echo "Результат: " . $result;
+}
+    ?>
+
+<form method="post">
+    <input type="number" name="num1" placeholder="Число 1">
+    <input type="number" name="num2" placeholder="Число 2">
+    <input type="submit" value="Сложить">
+    </form>
+
+2. Создайте PHP-скрипт для генерации случайного массива из 10 чисел и сортировки его в порядке убывания.
+    php
+<?php
+    $array = array();
+for ($i = 0; $i < 10; $i++) {
+    $array[] = rand(1, 100);
+}
+rsort($array);
+print_r($array);
+    ?>
+
+3. Разработайте форму обратной связи с двумя полями (имя и сообщение). Обработайте данные с помощью PHP и сохраните сообщение в текстовый файл.
+    php
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST["name"];
+    $message = $_POST["message"];
+    file_put_contents("messages.txt", "$name: $message\n", FILE_APPEND);
+}
+    ?>
+
+<form method="post">
+    <input type="text" name="name" placeholder="Имя">
+    <textarea name="message" placeholder="Сообщение"></textarea>
+<input type="submit" value="Отправить">
+</form>
+
+4. Напишите PHP-скрипт, который определяет, является ли число, введённое через форму, простым.
+    php
+<?php
+    function isPrime($n) {
+        if ($n <= 1) return false;
+        for ($i = 2; $i <= sqrt($n); $i++) {
+            if ($n % $i == 0) return false;
+        }
+        return true;
+    }
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $num = $_POST["num"];
+    echo isPrime($num) ? "Простое число" : "Не простое число";
+}
+?>
+
+<form method="post">
+    <input type="number" name="num" placeholder="Число">
+    <input type="submit" value="Проверить">
+</form>
+
+5. Создать форму с выбором из трёх языков. На основе выбора установить соответствующий файл cookie и вывести приветствие на выбранном языке.
+    php
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $lang = $_POST["lang"];
+    setcookie("lang", $lang, time() + 3600);
+    header("Location: " . $_SERVER["PHP_SELF"]);
+    exit;
+}
+
+$lang = isset($_COOKIE["lang"]) ? $_COOKIE["lang"] : "en";
+
+$greetings = array(
+    "en" => "Hello",
+    "ru" => "Привет",
+    "fr" => "Bonjour"
+);
+
+echo $greetings[$lang];
+?>
+
+<form method="post">
+    <select name="lang">
+        <option value="en">English</option>
+        <option value="ru">Русский</option>
+        <option value="fr">Français</option>
+    </select>
+    <input type="submit" value="Выбрать">
+</form>
+
+6. Реализовать форму для загрузки изображения. После загрузки проверить расширение файла и сохранить изображение в папку uploads.
+    php
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $allowedExtensions = array("jpg", "jpeg", "png", "gif");
+    $extension = pathinfo($_FILES["file"]["name"], PATHINFO_EXTENSION);
+    if (in_array($extension, $allowedExtensions)) {
+        move_uploaded_file($_FILES["file"]["tmp_name"], "uploads/" . $_FILES["file"]["name"]);
+        echo "Файл загружен успешно";
+    } else {
+        echo "Недопустимое расширение файла";
+    }
+}
+?>
+
+<form method="post" enctype="multipart/form-data">
+    <input type="file" name="file">
+    <input type="submit" value="Загрузить">
+</form>
+
+7. Разработайте PHP-скрипт для подсчёта количества посещений страницы с использованием сеансов.
+    php
+<?php
+    session_start();
+if (!isset($_SESSION["visits"])) {
+    $_SESSION["visits"] = 0;
+}
+$_SESSION["visits"]++;
+echo "Количество посещений: " . $_SESSION["visits"];
+    ?>
+
+8. Напишите функцию для поиска максимального значения в массиве, переданном через форму.
+    php
+<?php
+    function findMax($array) {
+        return max($array);
+    }
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $array = $_POST["array"];
+    $array = explode(",", $array);
+    echo "Максимальное значение: " . findMax($array);
+}
+?>
+
+<form method="post">
+    <input type="text" name="array" placeholder="Массив через запятую">
+    <input type="submit" value="Найти максимальное">
+    </form>
+
+9. Создать таблицу MySQL для хранения списка книг (название, автор, год). Написать PHP-скрипт для добавления новой книги в таблицу с помощью формы.
+    php
+<?php
+    // Подключение к базе данных
+    $conn = new mysqli("localhost", "username", "password", "database");
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $title = $_POST["title"];
+    $author = $_POST["author"];
+    $year = $_POST["year"];
+    $sql = "INSERT INTO books (title, author, year) VALUES ('$title', '$author', '$year')";
+    $conn->query($sql);
+    echo "Книга добавлена";
+}
+
+$conn->close();
+    ?>
+
+<form method="post">
+    <input type="text" name="title" placeholder="Название">
+    <input type="text" name="author" placeholder="Автор">
+    <input type="number" name="year" placeholder="Год">
+    <input type="submit" value="Добавить книгу">
+    </form>
+
+10. Реализовать PHP-скрипт для удаления файла, выбранного из списка файлов в заданной папке.
+    php
+<?php
+    $files = scandir("uploads");
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $file = $_POST["file"];
+    unlink("uploads/" . $file);
+    echo "Файл удален";
+}
+    ?>
+
+<form method="post">
+    <select name="file">
+<?php foreach ($files as $file) { ?>
+<option value="<?php echo $file; ?>"><?php echo $file; ?></option>
+    <?php } ?>
+</select>
+<input type="submit" value="Удалить файл">
+</form>
+
+11. Создайте страницу, которая принимает строку через форму и проверяет, содержит ли строка только буквы, с помощью регулярного выражения.
+    php
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $str = $_POST["str"];
+    if (preg_match("/^[a-zA-Z]+$/", $str)) {
+        echo "Строка содержит только буквы";
+    } else {
+        echo "Строка содержит не только буквы";
+    }
+}
+    ?>
+
+<form method="post">
+    <input type="text" name="str" placeholder="Строка">
+    <input type="submit" value="Проверить">
+    </form>
+
+12. Разработайте RESTful API на PHP для добавления записи в базу данных о клиентах (имя, телефон, электронная почта).
+php
+<?php
+    // Подключение к базе данных
+    $conn = new mysqli("localhost", "username", "password", "database");
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $data = json_decode(file_get_contents("php://input"), true);
+    $name = $data["name"];
+    $phone = $data["phone"];
+    $email = $data["email"];
+    $sql = "INSERT INTO clients (name, phone, email) VALUES ('$name', '$phone', '$email')";
+    $conn->query($sql);
+    echo "Запись добавлена";
+}
+
+$conn->close();
+    ?>
+
+13. Создать форму для ввода логина и пароля. Реализовать проверку введенных данных на соответствие заданным значениям.
+    php
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $login = $_POST["login"];
+    $password = $_POST["password"];
+    if ($login == "admin" && $password == "password") {
+        echo "Авторизация успешна";
+    } else {
+        echo "Неправильный логин или пароль";
+    }
+}
+    ?>
+
+<form method="post">
+    <input type="text" name="login" placeholder="Логин">
+    <input type="password" name="password" placeholder="Пароль">
+    <input type="submit" value="Войти">
+    </form>
+
+14. Напишите скрипт на PHP для вычисления факториала числа, введённого через форму.
+    php
+<?php
+    function factorial($n) {
+        if ($n == 0) return 1;
+        else return $n * factorial($n - 1);
+    }
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $num = $_POST["num"];
+    echo "Факториал: " . factorial($num);
+}
+    ?>
+
+<form method="post">
+    <input type="number" name="num" placeholder="Число">
+    <input type="submit" value="Вычислить факториал">
+    </form>
+
+15. Реализовать адаптивную веб-страницу с CSS, содержащую форму регистрации с двумя полями (имя и адрес электронной почты) и отправляющую данные через action.
+    xml
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+}
+    form {
+    max-width: 300px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+    input[type="text"], input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+}
+    input[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+    input[type="submit"]:hover {
+    background-color: #3e8e41;
+}
+</style>
+</head>
+<body>
+<form action="register.php" method="post">
+    <input type="text" name="name" placeholder="Имя">
+        <input type="email" name="email" placeholder="Email">
+            <input type="submit" value="Зарегистрироваться">
+</form>
+</body>
+</html>
+
+16. Разработайте интерфейс с использованием JavaScript, который динамически добавляет новые элементы списка при нажатии кнопки.
+xml
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Динамический список</title>
+            <style>
+                body {
+                font-family: Arial, sans-serif;
+            }
+                #list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+                #list li {
+                padding: 10px;
+                border-bottom: 1px solid #ccc;
+            }
+                #list li:last-child {
+                border-bottom: none;
+            }
+                button {
+                padding: 10px;
+                background-color: #4CAF50;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+                button:hover {
+                background-color: #3e8e41;
+            }
+            </style>
+</head>
+<body>
+<ul id="list"></ul>
+<button onclick="addListItem()">Добавить элемент</button>
+
+<script>
+    function addListItem() {
+    const list = document.getElementById("list");
+    const item = document.createElement("li");
+    item.textContent = `Элемент ${list.children.length + 1}`;
+    list.appendChild(item);
+}
+</script>
+</body>
+</html>
+
+17. Создать таблицу MySQL для хранения товаров (название, цена, количество). Написать запрос для выбора всех товаров с ценой выше заданного значения.
+sql
+CREATE TABLE products (
+id INT AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(255) NOT NULL,
+price DECIMAL(10, 2) NOT NULL,
+quantity INT NOT NULL
+);
+
+SELECT * FROM products WHERE price > 100;
+
+18. Напишите PHP-скрипт для чтения XML-документа и вывода его содержимого в виде HTML-таблицы.
+php
+<?php
+$xml = simplexml_load_file("example.xml");
+echo "<table border='1'>";
+echo "<tr><th>Имя</th><th>Возраст</th></tr>";
+foreach ($xml->person as $person) {
+    echo "<tr>";
+    echo "<td>" . $person->name . "</td>";
+    echo "<td>" . $person->age . "</td>";
+    echo "</tr>";
+}
+echo "</table>";
+?>
+
+19. Разработать пользовательский интерфейс для поиска информации по ключевому слову с использованием фильтров на JavaScript.
+xml
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Поиск информации</title>
+            <style>
+                body {
+                font-family: Arial, sans-serif;
+            }
+                #list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+                #list li {
+                padding: 10px;
+                border-bottom: 1px solid #ccc;
+            }
+                #list li:last-child {
+                border-bottom: none;
+            }
+                input[type="text"] {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 10px;
+                border: 1px solid #ccc;
+            }
+            </style>
+</head>
+<body>
+<input type="text" id="search" placeholder="Введите ключевое слово">
+    <ul id="list"></ul>
+
+    <script>
+        const list = document.getElementById("list");
+        const searchInput = document.getElementById("search");
+
+        const data = [
+        { name: "Item 1", description: "Description 1" },
+        { name: "Item 2", description: "Description 2" },
+        // ...
+        ];
+
+        function renderList() {
+        list.innerHTML = "";
+        const filter = searchInput.value.toLowerCase();
+        data.forEach(item => {
+        if (item.name.toLowerCase().includes(filter) || item.description.toLowerCase().includes(filter)) {
+        const li = document.createElement("li");
+        li.textContent = `${item.name} - ${item.description}`;
+        list.appendChild(li);
+    }
+    });
+    }
+
+        searchInput.addEventListener("input", renderList);
+        renderList();
+    </script>
+</body>
+</html>
+
+20. Написать скрипт для тестирования работы формы обратной связи (корректность заполнения всех полей).
+php
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST["name"];
+    $message = $_POST["message"];
+    if (!empty($name) && !empty($message)) {
+        echo "Форма заполнена корректно";
+    } else {
+        echo "Пожалуйста, заполните все поля";
+    }
+}
+?>
+
+<form method="post">
+    <input type="text" name="name" placeholder="Имя">
+        <textarea name="message" placeholder="Сообщение"></textarea>
+        <input type="submit" value="Отправить">
+</form>
+
+21. Создать страницу с формой, в которую нужно ввести номер телефона. Проверить правильность ввода с помощью регулярного выражения.
+xml
+<input type="text" pattern="^\+7\s$$\d{3}$$\s\d{3}-\d{2}-\d{2}$" name="phone" required>
+
+22. Разработайте PHP-скрипт для подсчёта и отображения количества строк в текстовом файле.
+
+<?php
+$file = 'path/to/your/file.txt';
+$count = count(file($file));
+echo "Количество строк: $count";
+?>
+
+23. Реализовать скрипт для загрузки CSV-файла и записи его содержимого в таблицу MySQL.
+<?php
+$csv = array();
+if (($handle = fopen("yourfile.csv", "r")) !== FALSE) {
+while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+$csv[] = $data;
+}
+fclose($handle);
+}
+
+// Connect to MySQL
+$conn = mysqli_connect("host", "user", "password", "database");
+
+// Insert data into MySQL table
+foreach ($csv as $row) {
+$sql = "INSERT INTO your_table (column1, column2, ...) VALUES ('$row', '$row[1]', ...)";
+mysqli_query($conn, $sql);
+}
+?>
+
+24. Создайте PHP-скрипт для выполнения подготовленного SQL-запроса с параметром, переданным через форму.
+<?php
+$stmt = $conn->prepare("SELECT * FROM your_table WHERE column = ?");
+$stmt->bind_param("s", $_POST['parameter']);
+$stmt->execute();
+$result = $stmt->get_result();
+?>
+
+25. Напишите программу на PHP, которая создаёт текстовый файл и записывает в него данные, введённые пользователем через форму.
+<?php
+$file = 'path/to/your/file.txt';
+$data = $_POST['user_input'];
+file_put_contents($file, $data);
+?>
+
+26. Разработать форму регистрации с полями (логин, пароль, электронная почта). Реализовать проверку обязательных полей на стороне сервера.
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if (empty($_POST["login"]) || empty($_POST["password"]) || empty($_POST["email"])) {
+echo "Все поля обязательны";
+} else {
+// Process the form data
+}
+}
+
+?>
+
+27. Создайте JavaScript-скрипт, который подсчитывает сумму значений всех полей формы и выводит результат.
+javascript
+
+<?php
+function calculateSum() {
+var sum = 0;
+var inputs = document.querySelectorAll('input[type="number"]');
+inputs.forEach(function(input) {
+sum += parseFloat(input.value);
+});
+document.getElementById('result').innerHTML = 'Сумма: ' + sum;
+}
+?>
+
+//28. Реализовать на PHP выборку из базы данных и отображение данных в виде HTML-таблицы.
+<?php
+$conn = mysqli_connect("host", "user", "password", "database");
+$sql = "SELECT * FROM your_table";
+$result = mysqli_query($conn, $sql);
+
+echo "<table>";
+    while ($row = mysqli_fetch_assoc($result)) {
+    echo "<tr>";
+        foreach ($row as $value) {
+        echo "<td>$value</td>";
+        }
+        echo "</tr>";
+    }
+    echo "</table>";
+    ?>
+
+29. Разработать RESTful API для чтения данных из базы и вывода их в формате JSON.
+<?php
+$conn = mysqli_connect("host", "user", "password", "database");
+$sql = "SELECT * FROM your_table";
+$result = mysqli_query($conn, $sql);
+
+$data = array();
+while ($row = mysqli_fetch_assoc($result)) {
+$data[] = $row;
+}
+
+header('Content-Type: application/json');
+echo json_encode($data);
+?>
+
+30. Напишите PHP-скрипт для создания каталога с именем, заданным пользователем через форму.
+<?php
+$dirname = $_POST['dirname'];
+mkdir($dirname);
+?>
+
+31. Реализовать тестирование корректности подключения к базе данных с помощью PHP.
+<?php
+$conn = mysqli_connect("host", "user", "password", "database");
+if (!$conn) {
+die("Connection failed: " . mysqli_connect_error());
+} else {
+echo "Connected successfully";
+}
+?>
+
+32. Опубликовать простое веб-приложение на локальном сервере и проверить его работоспособность.
+Установите локальный сервер (например, XAMPP, WAMP, MAMP).
+Разместите ваше веб-приложение в каталоге сервера (обычно htdocs или www).
+Откройте браузер и перейдите по адресу http://localhost/your-app для проверки.
